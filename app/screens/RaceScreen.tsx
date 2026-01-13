@@ -4,16 +4,16 @@ import { RaceSelectionScreen, SelectedRace } from '../components/race/RaceSelect
 import { RaceGoalSettingScreen } from '../components/race/RaceGoalSettingScreen';
 import { NutritionPlanningScreen } from '../components/race/NutritionPlanningScreen';
 import { useNavigate, useParams } from 'react-router-dom';
+import { safeGetLocalStorage } from '../utils/localStorage';
 
 export function RaceScreen() {
   const navigate = useNavigate();
   const { screen } = useParams();
 
   // Selected races state - to persist selected races across screens
-  // Load from localStorage on mount
+  // Load from localStorage on mount with safe parsing
   const [selectedRaces, setSelectedRaces] = React.useState<SelectedRace[]>(() => {
-    const saved = localStorage.getItem('selectedRaces');
-    return saved ? JSON.parse(saved) : [];
+    return safeGetLocalStorage<SelectedRace[]>('selectedRaces', []);
   });
 
   // Save selected races to localStorage whenever they change
@@ -42,13 +42,13 @@ export function RaceScreen() {
         onBack={() => navigate('/race')}
         onProceedToNutrition={() => navigate('/race/nutrition')}
         selectedGoal={localStorage.getItem('raceGoalScenario')}
-        previousMessages={JSON.parse(localStorage.getItem('raceGoalMessages') || '[]').map((msg: any) => ({
+        previousMessages={safeGetLocalStorage<any[]>('raceGoalMessages', []).map((msg: any) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
         }))}
-        previousMetrics={JSON.parse(localStorage.getItem('raceGoalMetrics') || 'null')}
-        previousConditions={JSON.parse(localStorage.getItem('raceGoalConditions') || 'null')}
-        previousConfirmedSections={JSON.parse(localStorage.getItem('raceGoalConfirmedSections') || 'null')}
+        previousMetrics={safeGetLocalStorage<any>('raceGoalMetrics', null)}
+        previousConditions={safeGetLocalStorage<any>('raceGoalConditions', null)}
+        previousConfirmedSections={safeGetLocalStorage<any>('raceGoalConfirmedSections', null)}
       />
     );
   }
