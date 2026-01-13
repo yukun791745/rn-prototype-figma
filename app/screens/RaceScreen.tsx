@@ -4,7 +4,7 @@ import { RaceSelectionScreen, SelectedRace } from '../components/race/RaceSelect
 import { RaceGoalSettingScreen } from '../components/race/RaceGoalSettingScreen';
 import { NutritionPlanningScreen } from '../components/race/NutritionPlanningScreen';
 import { useNavigate, useParams } from 'react-router-dom';
-import { safeGetLocalStorage } from '../utils/localStorage';
+import { safeGetLocalStorage, safeSetLocalStorage } from '../utils/localStorage';
 
 export function RaceScreen() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export function RaceScreen() {
 
   // Save selected races to localStorage whenever they change
   React.useEffect(() => {
-    localStorage.setItem('selectedRaces', JSON.stringify(selectedRaces));
+    safeSetLocalStorage('selectedRaces', selectedRaces);
   }, [selectedRaces]);
 
   const currentScreen = screen || 'overview';
@@ -41,7 +41,7 @@ export function RaceScreen() {
       <RaceGoalSettingScreen
         onBack={() => navigate('/race')}
         onProceedToNutrition={() => navigate('/race/nutrition')}
-        selectedGoal={localStorage.getItem('raceGoalScenario')}
+        selectedGoal={safeGetLocalStorage<string | null>('raceGoalScenario', null)}
         previousMessages={safeGetLocalStorage<any[]>('raceGoalMessages', []).map((msg: any) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
